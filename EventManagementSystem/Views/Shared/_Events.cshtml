@@ -1,0 +1,31 @@
+﻿
+@model EventManagementSystem.Models.UpcomingPassedEventsViewModel
+
+
+<div class="card">
+    <div class="card-header"><h1>Up Coming Events</h1></div>
+    <div class="card-body">
+        @if (Model.UpcomingEvents.Any())
+        {
+            @Html.DisplayFor(x => x.UpcomingEvents)
+        }
+        else
+        {
+            <p>No Upcoming Events</p>
+        }
+    </div>
+</div>
+<hr />
+<div class="card">
+    <div class="card-header"><h1>Passed Events</h1></div>
+    <div class="card-body">
+        @if (Model.PassedEvents.Any())
+        {
+            @Html.DisplayFor(x => x.PassedEvents)
+        }
+        else
+        {
+            <p>No Passed Events</p>
+        }
+    </div>
+</div>

@@ -4,30 +4,33 @@
     ViewBag.Title = "EventViewModel";
 }
 
-<h2>@Model.Title</h2>
-<span>@Model.StartDateTime</span>
 
-@if (Model.Duration != null)
-{
-    <span>
-        (@Model.Duration.Value.ToString(@"hh\:mm") hours)
-    </span>
-}
-@if (Model.Author != null)
-{
-    <span>@Model.Author</span>
-}
-@if (Model.Location != null)
-{
-    <span>@Model.Location</span>
-}
+<div class="event-box">
+    <h3>@Model.Title</h3>
+    <span class="date">@Model.StartDateTime</span>
 
-<div class="col-md-4">
-    <div id="event-details-@Model.Id">
-        @Ajax.ActionLink("View Details", "EventDetailsById", "Home",
-       new
-            {
-           id = Model.Id
-            }, new AjaxOptions { InsertionMode = InsertionMode.Replace, UpdateTargetId = "event-details-" + Model.Id }, new { @class = "btn btn-default" })
+    @if (Model.Duration != null)
+    {
+        <span class="duration">
+            (@Model.Duration.Value.ToString(@"hh\:mm") hours)
+        </span>
+    }
+    @if (Model.Author != null)
+    {
+        <span class="author">@Model.Author</span>
+    }
+    @if (Model.Location != null)
+    {
+        <span class="location">@Model.Location</span>
+    }
+
+    <div class="col-md-4">
+        <div id="event-details-@Model.Id">
+            @Ajax.ActionLink("View Details", "EventDetailsById", "Home",
+           new
+                {
+               id = Model.Id
+                }, new AjaxOptions { InsertionMode = InsertionMode.Replace, UpdateTargetId = "event-details-" + Model.Id }, new { @class = "btn btn-default" })
+        </div>
     </div>
 </div>
