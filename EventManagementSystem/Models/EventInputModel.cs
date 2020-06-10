@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Web;
 
 namespace EventManagementSystem.Models
@@ -25,9 +26,20 @@ namespace EventManagementSystem.Models
         [Display(Name ="Is Public?")]
         public bool IsPublic { get; set; }
 
-        public static Event CreateFromEvent(Event eventToEdit)
+        
+        public static Expression<Func<Event, EventInputModel>> CreateFromEvent
         {
-            throw new NotImplementedException();
+            get
+            {
+                return e => new EventInputModel()
+                {
+                    Title = e.Title,
+                    StartDateTime = e.StartDateTime,
+                    Duration = e.Duration,
+                    Description = e.Description,
+                    Location = e.Location
+                };
+            }
         }
     }
 }

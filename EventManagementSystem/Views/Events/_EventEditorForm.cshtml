@@ -1,0 +1,33 @@
+﻿
+@model EventManagementSystem.ViewModels.EventDetailsViewModel
+
+
+@if (Model.Description != null)
+{
+    <p>Description: @Model.Description</p>
+}
+@if (Model.Comments.Any())
+{
+    @:Comments:
+    <ul>
+        @foreach (var comment in Model.Comments)
+        {
+            <li>@comment.Text</li>
+            if (comment.Author != null)
+            {
+                @:(by @comment.Author)
+            }
+        }
+    </ul>
+}
+else
+{
+    <p>No Comments here</p>
+}
+@if (ViewBag.CanEdit)
+{
+    @Html.ActionLink("Edit", "Edit", "Events", new { id = Model.Id })
+    <span></span>
+    @Html.ActionLink("Delete", "Delete", "Events", new { id = Model.Id })
+}
+

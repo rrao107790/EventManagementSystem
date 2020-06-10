@@ -1,5 +1,6 @@
 ﻿using EventManagementSystem.Data;
 using EventManagementSystem.Models;
+using EventManagementSystem.ViewModels;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -68,8 +69,49 @@ namespace EventManagementSystem.Controllers
             {
                 return RedirectToAction("MyEvents");
             }
-            var model = EventInputModel.CreateFromEvent(eventToEdit);
-            return View(model);
+            return View(eventToEdit);
+        }
+
+        public ActionResult EventDetailsById(int id)
+        {
+            var currentUserId = this.User.Identity.GetUserId();
+            var isAdmin = this.IsAdmin();
+            var eventDetails = this.db.Events
+                                .Where(e => e.Id == id)
+                                .Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
+                                .Select(EventDetailsViewModel.ViewModel).FirstOrDefault();
+            var isOwner = (eventDetails != null || eventDetails.AuthorId != null && eventDetails.AuthorId == currentUserId);
+            this.ViewBag.CanEdit = isOwner || isAdmin;
+
+            return this.PartialView("_EventDetails", eventDetails);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(int id, EventInputModel model)
+        {
+
+            //var eventToEdit = db.Events.Where(x => x.Id == id).FirstOrDefault();
+
+            var eventToEdit = LoadEvent(id);
+            //if (eventToEdit == null)
+            //{
+            //    RedirectToAction("MyEvents");
+            //}
+
+            //if(model !=null && ModelState.IsValid)
+            //{
+            //    eventToEdit.Title = model.Title;
+            //    eventToEdit.StartDateTime = model.StartDateTime;
+            //    eventToEdit.Duration = model.Duration;
+            //    eventToEdit.Description = model.Description;
+            //    eventToEdit.Location = model.Location;
+            //    eventToEdit.IsPublic = model.IsPublic;
+
+            //    db.SaveChanges();
+            //    return RedirectToAction("MyEvents");
+            //}
+
+            return View(eventToEdit);
         }
 
         // Loads the event
