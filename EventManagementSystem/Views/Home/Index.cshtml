@@ -1,0 +1,28 @@
+﻿@model EventManagementSystem.Models.UpcomingPassedEventsViewModel
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<h1>UpComing Events</h1>
+
+<div class="row">
+    @if (Model.UpcomingEvents.Any())
+    {
+        @Html.DisplayFor(x => x.UpcomingEvents)
+    }
+    else
+    {
+        <p>No Upcoming Events</p>
+    }
+</div>
+<div class="row">
+    @if (Model.PassedEvents.Any())
+    {
+        @Html.DisplayFor(x => x.PassedEvents)
+    }
+    else
+    {
+        <p>No Passed Events</p>
+    }
+</div>

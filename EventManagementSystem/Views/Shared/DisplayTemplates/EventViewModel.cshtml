@@ -1,0 +1,23 @@
+﻿@model EventManagementSystem.Models.EventViewModel
+
+@{
+    ViewBag.Title = "EventViewModel";
+}
+
+<h2>@Model.Title</h2>
+<span>@Model.StartDateTime</span>
+
+@if(Model.Duration != null)
+{
+<span>
+    (@Model.Duration.Value.ToString(@"hh\:mm") hours)
+</span>
+}
+ @if(Model.Author != null)
+ {
+     <span>@Model.Author</span>
+ }
+@if (Model.Location != null)
+{
+    <span>@Model.Location</span>
+}
