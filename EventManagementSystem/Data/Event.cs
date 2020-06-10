@@ -23,7 +23,7 @@ namespace EventManagementSystem.Data
         public string Title { get; set; }
         public DateTime StartDateTime { get; set; }
         public TimeSpan? Duration { get; set; }
-        public int? AuthorId { get; set; }
+        public string AuthorId { get; set; }
         public virtual ApplicationUser Author { get; set; }
         public string Description { get; set; }
         

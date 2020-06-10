@@ -15,6 +15,7 @@
     {
         <p>No Upcoming Events</p>
     }
+   
 </div>
 <div class="row">
     @if (Model.PassedEvents.Any())
@@ -26,3 +27,6 @@
         <p>No Passed Events</p>
     }
 </div>
+@section Scripts{
+    @Scripts.Render("~/bundles/ajax")
+    }
