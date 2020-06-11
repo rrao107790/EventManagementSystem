@@ -65,16 +65,12 @@ namespace EventManagementSystem.Controllers
         // edits the forms
         public ActionResult Edit(int id)
         {
-            //var eventToEdit = LoadEvent(id);
-            //if(eventToEdit == null)
-            //{
-            //    return RedirectToAction("MyEvents");
-            //}
+            
             var currentUserId = this.User.Identity.GetUserId();
             var isAdmin = this.IsAdmin();
             var eventDetails = this.db.Events
                                 .Where(e => e.Id == id)
-                                .Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
+                                .Where(e => e.IsPublic && e.AuthorId == currentUserId || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
                                 .Select(EventInputModel.CreateFromEvent).FirstOrDefault();
             var isOwner = (eventDetails != null);
             this.ViewBag.CanEdit = isOwner || isAdmin;
@@ -106,11 +102,20 @@ namespace EventManagementSystem.Controllers
 
         public ActionResult Delete(int id)
         {
+            //var currentUserId = this.User.Identity.GetUserId();
+            //var isAdmin = this.IsAdmin();
+            //var eventDetails = this.db.Events
+            //                    .Where(e => e.Id == id)
+            //                    .Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
+            //                    .Select(EventInputModel.CreateFromEvent).FirstOrDefault();
+            //var isOwner = (eventDetails != null);
+            //this.ViewBag.CanEdit = isOwner || isAdmin;
+            //return View(eventDetails);
             var currentUserId = this.User.Identity.GetUserId();
             var isAdmin = this.IsAdmin();
             var eventDetails = this.db.Events
                                 .Where(e => e.Id == id)
-                                .Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
+                                .Where(e => e.IsPublic && e.AuthorId == currentUserId || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
                                 .Select(EventInputModel.CreateFromEvent).FirstOrDefault();
             var isOwner = (eventDetails != null);
             this.ViewBag.CanEdit = isOwner || isAdmin;
@@ -120,7 +125,9 @@ namespace EventManagementSystem.Controllers
         [HttpPost]
         public ActionResult Delete(int id, Event model)
         {
-            var eventToDelete = db.Events.Find(id);
+            var currentUserId = this.User.Identity.GetUserId();
+            var isAdmin = this.IsAdmin();
+            var eventToDelete = db.Events.Where(e => e.Id == id).Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId)).FirstOrDefault();
             if (model != null)
             {
                 db.Events.Remove(eventToDelete);

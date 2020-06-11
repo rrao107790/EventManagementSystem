@@ -38,8 +38,4 @@ textarea {
     word-wrap:break-word;
     box-shadow:0px 0px 3px #808080;
 }
-    .event-box:hover {
-        background-color: white;
-        box-shadow: 0px 0px 10px #808080;
-        transition:0.5s;
-    }
+   
