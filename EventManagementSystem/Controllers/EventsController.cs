@@ -1,6 +1,7 @@
 ﻿using EventManagementSystem.Data;
 using EventManagementSystem.Models;
 using EventManagementSystem.ViewModels;
+using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace EventManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(EventInputModel model)
         {
-            if(model !=null && ModelState.IsValid)
+            if (model != null && ModelState.IsValid)
             {
                 var e = new Event()
                 {
@@ -80,7 +81,7 @@ namespace EventManagementSystem.Controllers
             return View(eventDetails);
         }
 
-     
+
         [HttpPost]
         public ActionResult Edit(int id, EventInputModel model)
         {
@@ -103,14 +104,6 @@ namespace EventManagementSystem.Controllers
             return RedirectToAction("MyEvents");
         }
 
-        //// Loads the event
-        //private Event LoadEvent(int id)
-        //{
-        //    var currentUserId = User.Identity.GetUserId();
-        //    var isAdmin = IsAdmin();
-        //    var eventToEdit = db.Events.Where(x => x.Id == id).FirstOrDefault(e => e.AuthorId == currentUserId || isAdmin);
-        //    return eventToEdit;
-        //}
         public ActionResult Delete(int id)
         {
             var currentUserId = this.User.Identity.GetUserId();
@@ -125,22 +118,17 @@ namespace EventManagementSystem.Controllers
         }
 
         [HttpPost]
-        public ActionResult Delete(int id, EventInputModel model)
+        public ActionResult Delete(int id, Event model)
         {
-            var eventToEdit = db.Events.Where(x => x.Id == id).FirstOrDefault();
-
-            if (model != null && ModelState.IsValid)
+            var eventToDelete = db.Events.Find(id);
+            if (model != null)
             {
-                eventToEdit.Title = model.Title;
-                eventToEdit.StartDateTime = model.StartDateTime;
-                eventToEdit.Duration = model.Duration;
-                eventToEdit.Description = model.Description;
-                eventToEdit.Location = model.Location;
-                eventToEdit.IsPublic = model.IsPublic;
+                db.Events.Remove(eventToDelete);
                 db.SaveChanges();
                 return RedirectToAction("MyEvents");
             }
-            return View();
+            return RedirectToAction("Error");
+
         }
     }
 }
