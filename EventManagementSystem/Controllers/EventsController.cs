@@ -111,5 +111,36 @@ namespace EventManagementSystem.Controllers
         //    var eventToEdit = db.Events.Where(x => x.Id == id).FirstOrDefault(e => e.AuthorId == currentUserId || isAdmin);
         //    return eventToEdit;
         //}
+        public ActionResult Delete(int id)
+        {
+            var currentUserId = this.User.Identity.GetUserId();
+            var isAdmin = this.IsAdmin();
+            var eventDetails = this.db.Events
+                                .Where(e => e.Id == id)
+                                .Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
+                                .Select(EventInputModel.CreateFromEvent).FirstOrDefault();
+            var isOwner = (eventDetails != null);
+            this.ViewBag.CanEdit = isOwner || isAdmin;
+            return View(eventDetails);
+        }
+
+        [HttpPost]
+        public ActionResult Delete(int id, EventInputModel model)
+        {
+            var eventToEdit = db.Events.Where(x => x.Id == id).FirstOrDefault();
+
+            if (model != null && ModelState.IsValid)
+            {
+                eventToEdit.Title = model.Title;
+                eventToEdit.StartDateTime = model.StartDateTime;
+                eventToEdit.Duration = model.Duration;
+                eventToEdit.Description = model.Description;
+                eventToEdit.Location = model.Location;
+                eventToEdit.IsPublic = model.IsPublic;
+                db.SaveChanges();
+                return RedirectToAction("MyEvents");
+            }
+            return View();
+        }
     }
 }
