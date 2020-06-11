@@ -23,10 +23,26 @@ else
 {
     <p>No Comments here</p>
 }
-@if (ViewBag.CanEdit)
-{
-    @Html.ActionLink("Edit", "Edit", "Events", new { id = Model.Id }, new {@class="btn btn-default" })
-    <span></span>
-    @Html.ActionLink("Delete", "Delete", "Events", new { id = Model.Id }, new {@class="btn btn-default" })
-}
+
+<div class="form-group">
+    <div id="event-details">
+        @*<button class="add-comment">Add Comment</button>*@
+        @Ajax.ActionLink("Add Comment", "GetCommentSection", "Home", 
+       new { id = Model.Id }, new AjaxOptions() { UpdateTargetId = "event-details" })
+
+    </div>
+</div>
+<div class="form-group">
+    @if (ViewBag.CanEdit)
+    {
+        @Html.ActionLink("Edit", "Edit", "Events", new { id = Model.Id }, new { @class = "btn btn-default" })
+        <span></span>
+        @Html.ActionLink("Delete", "Delete", "Events", new { id = Model.Id }, new { @class = "btn btn-default" })
+        <span></span>
+
+    }
+
+
+
+</div>
 

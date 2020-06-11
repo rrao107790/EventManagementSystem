@@ -1,4 +1,5 @@
-﻿using EventManagementSystem.Models;
+﻿using EventManagementSystem.Data;
+using EventManagementSystem.Models;
 using EventManagementSystem.ViewModels;
 using Microsoft.AspNet.Identity;
 using System;
@@ -36,18 +37,39 @@ namespace EventManagementSystem.Controllers
             });
         }
 
+        // get event details
         public ActionResult EventDetailsById(int id)
         {
-            var currentUserId = this.User.Identity.GetUserId();
-            var isAdmin = this.IsAdmin();
-            var eventDetails = this.db.Events
+            var currentUserId = User.Identity.GetUserId();
+            var isAdmin = IsAdmin();
+            var eventDetails =  db.Events
                                 .Where(e => e.Id == id)
                                 .Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
                                 .Select(EventDetailsViewModel.ViewModel).FirstOrDefault();
             var isOwner = (eventDetails != null || eventDetails.AuthorId != null && eventDetails.AuthorId == currentUserId);
             this.ViewBag.CanEdit = isOwner || isAdmin;
 
-            return this.PartialView("_EventDetails",eventDetails);
+            return PartialView("_EventDetails",eventDetails);
+        }
+
+        // get the comments posted by User
+        public ActionResult OpenComments(int id)
+        {
+            var currentUserId = User.Identity.GetUserId();
+            var isAdmin = IsAdmin();
+            var eventDetails = db.Comments
+                                .Where(e => e.Id == id)
+                                .Where(e=>e.AuthorId != null && e.AuthorId == currentUserId)
+                                .Select(CommentViewModel.ViewModel).FirstOrDefault();
+            var isOwner = (eventDetails != null || (eventDetails.AuthorId != null && eventDetails.AuthorId == currentUserId));
+            this.ViewBag.CanEdit = isOwner || isAdmin;
+
+            return PartialView("_AddComment", eventDetails);
+        }
+
+        public ActionResult GetCommentSection(int id)
+        {
+            return PartialView("_AddComment");
         }
     }
 }

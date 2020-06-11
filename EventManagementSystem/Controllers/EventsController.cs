@@ -135,7 +135,22 @@ namespace EventManagementSystem.Controllers
                 return RedirectToAction("MyEvents");
             }
             return RedirectToAction("Error");
+        }
 
+        public ActionResult SubmitComment(CommentViewModel model)
+        {
+            if(model != null && ModelState.IsValid)
+            {
+                var e = new Comment()
+                {
+                    Text = model.Text,
+                    AuthorId = model.Author
+                };
+                db.Comments.Add(e);
+                db.SaveChanges();
+                return PartialView("_AddComment",model);
+            }
+            return View();
         }
     }
 }

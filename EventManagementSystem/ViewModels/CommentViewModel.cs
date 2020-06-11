@@ -6,6 +6,7 @@ namespace EventManagementSystem.ViewModels
 {
     public class CommentViewModel
     {
+        public string AuthorId { get; set; }
         public string Text { get; set; }
 
         public string Author { get; set; }
@@ -15,6 +16,7 @@ namespace EventManagementSystem.ViewModels
             {
                 return c => new CommentViewModel()
                 {
+                    AuthorId = c.AuthorId,
                     Text = c.Text,
                     Author = c.Author.FullName
                 };
