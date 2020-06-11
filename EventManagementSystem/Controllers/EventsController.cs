@@ -64,63 +64,52 @@ namespace EventManagementSystem.Controllers
         // edits the forms
         public ActionResult Edit(int id)
         {
-            var eventToEdit = LoadEvent(id);
-            if(eventToEdit == null)
-            {
-                return RedirectToAction("MyEvents");
-            }
-            return View(eventToEdit);
-        }
-
-        public ActionResult EventDetailsById(int id)
-        {
+            //var eventToEdit = LoadEvent(id);
+            //if(eventToEdit == null)
+            //{
+            //    return RedirectToAction("MyEvents");
+            //}
             var currentUserId = this.User.Identity.GetUserId();
             var isAdmin = this.IsAdmin();
             var eventDetails = this.db.Events
                                 .Where(e => e.Id == id)
                                 .Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
-                                .Select(EventDetailsViewModel.ViewModel).FirstOrDefault();
-            var isOwner = (eventDetails != null || eventDetails.AuthorId != null && eventDetails.AuthorId == currentUserId);
+                                .Select(EventInputModel.CreateFromEvent).FirstOrDefault();
+            var isOwner = (eventDetails != null);
             this.ViewBag.CanEdit = isOwner || isAdmin;
-
-            return this.PartialView("_EventDetails", eventDetails);
+            return View(eventDetails);
         }
 
+     
         [HttpPost]
         public ActionResult Edit(int id, EventInputModel model)
         {
 
-            //var eventToEdit = db.Events.Where(x => x.Id == id).FirstOrDefault();
+            var eventToEdit = db.Events.Where(x => x.Id == id).FirstOrDefault();
 
-            var eventToEdit = LoadEvent(id);
-            //if (eventToEdit == null)
-            //{
-            //    RedirectToAction("MyEvents");
-            //}
+            if (model != null && ModelState.IsValid)
+            {
+                eventToEdit.Title = model.Title;
+                eventToEdit.StartDateTime = model.StartDateTime;
+                eventToEdit.Duration = model.Duration;
+                eventToEdit.Description = model.Description;
+                eventToEdit.Location = model.Location;
+                eventToEdit.IsPublic = model.IsPublic;
 
-            //if(model !=null && ModelState.IsValid)
-            //{
-            //    eventToEdit.Title = model.Title;
-            //    eventToEdit.StartDateTime = model.StartDateTime;
-            //    eventToEdit.Duration = model.Duration;
-            //    eventToEdit.Description = model.Description;
-            //    eventToEdit.Location = model.Location;
-            //    eventToEdit.IsPublic = model.IsPublic;
+                db.SaveChanges();
+                return RedirectToAction("MyEvents");
+            }
 
-            //    db.SaveChanges();
-            //    return RedirectToAction("MyEvents");
-            //}
-
-            return View(eventToEdit);
+            return RedirectToAction("MyEvents");
         }
 
-        // Loads the event
-        private Event LoadEvent(int id)
-        {
-            var currentUserId = User.Identity.GetUserId();
-            var isAdmin = IsAdmin();
-            var eventToEdit = db.Events.Where(x => x.Id == id).FirstOrDefault(e => e.AuthorId == currentUserId || isAdmin);
-            return eventToEdit;
-        }
+        //// Loads the event
+        //private Event LoadEvent(int id)
+        //{
+        //    var currentUserId = User.Identity.GetUserId();
+        //    var isAdmin = IsAdmin();
+        //    var eventToEdit = db.Events.Where(x => x.Id == id).FirstOrDefault(e => e.AuthorId == currentUserId || isAdmin);
+        //    return eventToEdit;
+        //}
     }
 }
