@@ -112,9 +112,34 @@ namespace EventManagementSystem.Controllers
                                 .Where(e => e.Id == id)
                                 .Where(e => e.IsPublic && e.AuthorId == currentUserId || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
                                 .Select(EventInputModel.CreateFromEvent).FirstOrDefault();
+
+            if (eventDetails == null)
+            {
+                this.AddNotification("You cannot delete an event created by someone", NotificationType.ERROR);
+            }
+
             var isOwner = (eventDetails != null);
             this.ViewBag.CanEdit = isOwner || isAdmin;
             return View(eventDetails);
+        }
+
+        [HttpPost]
+        public ActionResult Delete(int id, EventInputModel events)
+        {
+            var currentUserId = this.User.Identity.GetUserId();
+            var eventToDelete = db.Events.Where(x => x.Id == id && x.AuthorId == currentUserId).FirstOrDefault();
+            if (eventToDelete != null)
+            {
+                db.Events.Remove(eventToDelete);
+                db.SaveChanges();
+                this.AddNotification("Delete Success!", NotificationType.SUCCESS);
+                return RedirectToAction("MyEvents");
+               
+            }
+            this.AddNotification("You cannot delete an event created by someone", NotificationType.ERROR);
+            return RedirectToAction("Index","Home");
+
+
         }
 
         // call the ajax button method and redirect the specific action
@@ -144,6 +169,7 @@ namespace EventManagementSystem.Controllers
             var commentToDelete = db.Comments.Where(x => x.Id == id && x.AuthorId == currentUserId).FirstOrDefault();
 
             bool status = commentToDelete == null;
+            // if author id doesn't match they can't delete the comment
             if (status)
             {
                 this.AddNotification("You cannot delete someone else's comment because you are authorized", NotificationType.ERROR);
