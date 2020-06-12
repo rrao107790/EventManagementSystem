@@ -118,9 +118,15 @@ namespace EventManagementSystem.Controllers
 
         public ActionResult DeleteComment(int id)
         {
-            CommentViewModel obj = new CommentViewModel();
-            obj.EventId = id;
-            return PartialView("_AddComment", obj);
+            var currentUserId = User.Identity.GetUserId();
+            var isAdmin = IsAdmin();
+            var eventDetails = db.Comments
+                                .Where(e => e.Id == id)
+                                .Where(e => e.AuthorId != null && e.AuthorId == currentUserId)
+                                .Select(CommentViewModel.ViewModel).FirstOrDefault();
+            
+
+            return PartialView("_AddComment", eventDetails);
         }
 
         [HttpPost]
