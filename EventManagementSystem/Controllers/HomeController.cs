@@ -31,7 +31,8 @@ namespace EventManagementSystem.Controllers
             var passedEvents = events.Where(e => e.StartDateTime <= DateTime.Now);
 
 
-            return View(new UpcomingPassedEventsViewModel() { 
+            return View(new UpcomingPassedEventsViewModel()
+            {
                 UpcomingEvents = upcomingEvents,
                 PassedEvents = passedEvents
             });
@@ -42,14 +43,14 @@ namespace EventManagementSystem.Controllers
         {
             var currentUserId = User.Identity.GetUserId();
             var isAdmin = IsAdmin();
-            var eventDetails =  db.Events
+            var eventDetails = db.Events
                                 .Where(e => e.Id == id)
                                 .Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
                                 .Select(EventDetailsViewModel.ViewModel).FirstOrDefault();
             var isOwner = (eventDetails != null || eventDetails.AuthorId != null && eventDetails.AuthorId == currentUserId);
             this.ViewBag.CanEdit = isOwner || isAdmin;
 
-            return PartialView("_EventDetails",eventDetails);
+            return PartialView("_EventDetails", eventDetails);
         }
 
         // get the comments posted by User
@@ -59,7 +60,7 @@ namespace EventManagementSystem.Controllers
             var isAdmin = IsAdmin();
             var eventDetails = db.Comments
                                 .Where(e => e.Id == id)
-                                .Where(e=>e.AuthorId != null && e.AuthorId == currentUserId)
+                                .Where(e => e.AuthorId != null && e.AuthorId == currentUserId)
                                 .Select(CommentViewModel.ViewModel).FirstOrDefault();
             var isOwner = (eventDetails != null || (eventDetails.AuthorId != null && eventDetails.AuthorId == currentUserId));
             this.ViewBag.CanEdit = isOwner || isAdmin;
@@ -67,9 +68,52 @@ namespace EventManagementSystem.Controllers
             return PartialView("_AddComment", eventDetails);
         }
 
+        // Get the Partial View for  Displaying Comment Box
         public ActionResult GetCommentSection(int id)
         {
-            return PartialView("_AddComment");
+            CommentViewModel obj = new CommentViewModel();
+            obj.EventId = id;
+            return PartialView("_AddComment", obj);
         }
+
+        public ActionResult SubmitComment(int id)
+        {
+            var eventDetails = db.Events.Where(x=>x.Id==id)
+                        .Select(EventDetailsViewModel.ViewModel).FirstOrDefault();
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult SubmitComment(CommentViewModel model)
+        {
+            try
+            {
+                if (model != null && ModelState.IsValid)
+                {
+
+                    Comment e = null;
+                    e = new Comment();
+
+                    //e.AuthorId = User.Identity.GetUserId();
+                    e.Date = DateTime.UtcNow;
+                    e.Text = model.Text;
+                    e.EventId = model.EventId;
+                    
+
+                    db.Comments.Add(e);
+                    db.SaveChanges();
+
+                    return RedirectToAction("Index");
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
     }
 }

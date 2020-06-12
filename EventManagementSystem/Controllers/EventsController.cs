@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Services.Description;
 
 namespace EventManagementSystem.Controllers
 {
@@ -62,10 +63,11 @@ namespace EventManagementSystem.Controllers
             });
         }
 
+
         // edits the forms
         public ActionResult Edit(int id)
         {
-            
+
             var currentUserId = this.User.Identity.GetUserId();
             var isAdmin = this.IsAdmin();
             var eventDetails = this.db.Events
@@ -102,15 +104,6 @@ namespace EventManagementSystem.Controllers
 
         public ActionResult Delete(int id)
         {
-            //var currentUserId = this.User.Identity.GetUserId();
-            //var isAdmin = this.IsAdmin();
-            //var eventDetails = this.db.Events
-            //                    .Where(e => e.Id == id)
-            //                    .Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
-            //                    .Select(EventInputModel.CreateFromEvent).FirstOrDefault();
-            //var isOwner = (eventDetails != null);
-            //this.ViewBag.CanEdit = isOwner || isAdmin;
-            //return View(eventDetails);
             var currentUserId = this.User.Identity.GetUserId();
             var isAdmin = this.IsAdmin();
             var eventDetails = this.db.Events
@@ -125,7 +118,7 @@ namespace EventManagementSystem.Controllers
         [HttpPost]
         public ActionResult Delete(int id, Event model)
         {
-            var currentUserId = this.User.Identity.GetUserId();
+            var currentUserId = User.Identity.GetUserId();
             var isAdmin = this.IsAdmin();
             var eventToDelete = db.Events.Where(e => e.Id == id).Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId)).FirstOrDefault();
             if (model != null)
@@ -137,20 +130,40 @@ namespace EventManagementSystem.Controllers
             return RedirectToAction("Error");
         }
 
-        public ActionResult SubmitComment(CommentViewModel model)
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult SubmitComment(CommentInputModel model)
         {
-            if(model != null && ModelState.IsValid)
+            try
             {
-                var e = new Comment()
+                if (model != null && ModelState.IsValid)
                 {
-                    Text = model.Text,
-                    AuthorId = model.Author
-                };
-                db.Comments.Add(e);
-                db.SaveChanges();
-                return PartialView("_AddComment",model);
+
+
+                    var e = new Comment()
+                    {
+
+                        AuthorId = User.Identity.GetUserId(),
+                        Author = db.Users.First(),
+                        //Id = model.Id,
+                        Date = DateTime.Now,
+                        Text = model.Text,
+                    };
+
+                    db.Comments.Add(e);
+                    db.SaveChanges();
+
+                    return RedirectToAction("MyEvents");
+                }
+                return View(model);
             }
-            return View();
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
         }
+
     }
 }
