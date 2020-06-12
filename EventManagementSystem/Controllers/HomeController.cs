@@ -1,4 +1,5 @@
 ﻿using EventManagementSystem.Data;
+using EventManagementSystem.Extensions;
 using EventManagementSystem.Models;
 using EventManagementSystem.ViewModels;
 using Microsoft.AspNet.Identity;
@@ -78,7 +79,7 @@ namespace EventManagementSystem.Controllers
 
         public ActionResult SubmitComment(int id)
         {
-            var eventDetails = db.Events.Where(x=>x.Id==id)
+            var eventDetails = db.Events.Where(x => x.Id == id)
                         .Select(EventDetailsViewModel.ViewModel).FirstOrDefault();
 
             return View();
@@ -104,7 +105,7 @@ namespace EventManagementSystem.Controllers
 
                     db.Comments.Add(e);
                     db.SaveChanges();
-
+                    this.AddNotification("Comment Added Successfully!", NotificationType.SUCCESS);
                     return RedirectToAction("Index");
                 }
                 return View(model);
@@ -125,7 +126,7 @@ namespace EventManagementSystem.Controllers
         [HttpPost]
         public ActionResult DeleteCommentById(int id)
         {
-            
+
             return RedirectToAction("Index");
         }
 

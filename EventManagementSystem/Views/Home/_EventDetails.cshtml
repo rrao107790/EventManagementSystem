@@ -1,7 +1,6 @@
 ﻿
 @model EventManagementSystem.ViewModels.EventDetailsViewModel
-<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
-<script src="~/Scripts/bootstrap.min.js"></script>
+
 
 @if (Model.Description != null)
 {
@@ -15,10 +14,15 @@
 
                @foreach (var comment in Model.Comments)
                {
-                   <li>@comment.Text</li>
+
+                   <li>
+                       @comment.Text
+                       @Html.ActionLink("Delete", "DeleteComment", "Home")
+                   </li>
                    if (comment.Author != null)
                    {
                        @:- @comment.Author
+                       @Html.ActionLink("Delete", "DeleteComment", "Home")
                        @:<br /><br />
                    }
                    else

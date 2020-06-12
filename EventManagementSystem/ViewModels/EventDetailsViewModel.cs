@@ -16,6 +16,8 @@ namespace EventManagementSystem.ViewModels
         public string AuthorId { get; set; }
         public IEnumerable<CommentViewModel> Comments { get; set; }
 
+        public int CommentId { get; set; }
+
         public static Expression<Func<Event,EventDetailsViewModel>> ViewModel
         {
             get

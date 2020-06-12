@@ -1,4 +1,5 @@
 ﻿using EventManagementSystem.Data;
+using EventManagementSystem.Extensions;
 using EventManagementSystem.Models;
 using EventManagementSystem.ViewModels;
 using Microsoft.Ajax.Utilities;
@@ -40,7 +41,7 @@ namespace EventManagementSystem.Controllers
 
                 db.Events.Add(e);
                 db.SaveChanges();
-
+                this.AddNotification("Event Created Successfully!",NotificationType.SUCCESS);
                 return RedirectToAction("MyEvents");
             }
             return View(model);
@@ -153,7 +154,7 @@ namespace EventManagementSystem.Controllers
 
                     db.Comments.Add(e);
                     db.SaveChanges();
-
+                 
                     return RedirectToAction("MyEvents");
                 }
                 return View(model);
