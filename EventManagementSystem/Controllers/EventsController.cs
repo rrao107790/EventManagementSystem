@@ -129,36 +129,30 @@ namespace EventManagementSystem.Controllers
             var showComments = db.Comments.ToList();
             return View(showComments);
         }
+        [HttpPost]
+        public ActionResult ShowComments(int id)
+        {
+            var showComments = db.Comments.ToList();
+
+            return View(showComments);
+        }
 
         // get the comment to delete
         public ActionResult DeleteComment(int id)
         {
-            var commentToDelete = db.Comments.Find(id);
-            return View(commentToDelete);
-        }
+            var currentUserId = this.User.Identity.GetUserId();
+            var commentToDelete = db.Comments.Where(x => x.Id == id && x.AuthorId == currentUserId).FirstOrDefault();
 
-        // delete Comment and redirect to Index Action
-        [HttpPost]
-        public ActionResult DeleteComment(int id, Comment model)
-        {
-            var currentUserId = User.Identity.GetUserId();
-            var isAdmin = this.IsAdmin();
-            var eventToDelete = db.Comments.Where(e => e.Id == id).FirstOrDefault(e => e.AuthorId == currentUserId);
-            bool status = eventToDelete == null;
+            bool status = commentToDelete == null;
             if (status)
             {
-                this.AddNotification("You cannot delete somebody else's comment", NotificationType.ERROR);
+                this.AddNotification("You cannot delete someone else's comment because you are authorized", NotificationType.ERROR);
             }
-            else
-            {
-                db.Comments.Remove(eventToDelete);
-                db.SaveChanges();
-                this.AddNotification("Comment Deleted Successfully!", NotificationType.SUCCESS);
-                return RedirectToAction("MyEvents");
-            }
-            return RedirectToAction("DeleteComment");
+
+            db.Comments.Remove(commentToDelete);
+            db.SaveChanges();
+            this.AddNotification("Comment Deletion Success!", NotificationType.SUCCESS);
+            return RedirectToAction("Index");
         }
-
-
     }
 }

@@ -51,6 +51,10 @@ namespace EventManagementSystem.Controllers
             var isOwner = (eventDetails != null || eventDetails.AuthorId != null && eventDetails.AuthorId == currentUserId);
             this.ViewBag.CanEdit = isOwner || isAdmin;
 
+            EventDetailsViewModel obj = new EventDetailsViewModel();
+            obj.Comments = eventDetails.Comments;
+            obj.Id = eventDetails.CommentId;
+
             return PartialView("_EventDetails", eventDetails);
         }
 

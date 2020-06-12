@@ -32,17 +32,5 @@ namespace EventManagementSystem.ViewModels
             }
         }
 
-        public static Func<Event,EventDetailsViewModel> GetIdentification
-        {
-
-            get
-            {
-                return a => new EventDetailsViewModel()
-                {
-                    Id = a.Id
-                };
-            }
-
-        }
     }
 }

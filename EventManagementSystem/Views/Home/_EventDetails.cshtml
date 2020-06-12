@@ -17,8 +17,12 @@
 
                 <li>
                     @comment.Text
-                    @*@Html.ActionLink("Delete", "DeleteComment", "Event", new { id= EventManagementSystem.Data.Comment }, new { @class="btn btn-default"})*@
-                    @Html.HiddenFor(model => model.CommentId)
+                    @*@Ajax.ActionLink("Delete", "DeleteComment", "Events", new { id = comment.CommentId }, new AjaxOptions() { UpdateTargetId = "comments" })*@
+                    @Ajax.ActionLink("Delete", "DeleteComment", "Events",
+                new
+              {
+             id = comment.CommentId
+              }, new AjaxOptions { InsertionMode = InsertionMode.Replace, UpdateTargetId = "comments" }, new { @class = "btn btn-default" })
                 </li>
                 if (comment.Author != null)
                 {
@@ -52,9 +56,8 @@
         @Html.ActionLink("Edit", "Edit", "Events", new { id = Model.Id }, new { @class = "btn btn-default" })
         <span></span>
         @Html.ActionLink("Delete", "Delete", "Events", new { id = Model.Id }, new { @class = "btn btn-default" })
-    <span></span>
-        @Html.ActionLink("Manage Comments", "ManageComments", "Events", new { id = Model.Id }, new { @class = "btn btn-default" })
-       
+    
+
     }
 </div>
 
