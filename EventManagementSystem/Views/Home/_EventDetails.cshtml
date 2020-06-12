@@ -10,28 +10,29 @@
     @if (Model.Comments.Any())
     {
         @: <h3>Comments:</h3>
-           <ul class="comments">
+        <ul class="comments">
 
-               @foreach (var comment in Model.Comments)
-               {
+            @foreach (var comment in Model.Comments)
+            {
 
-                   <li>
-                       @comment.Text
-                       @Html.ActionLink("Delete", "DeleteComment", "Home")
-                   </li>
-                   if (comment.Author != null)
-                   {
-                       @:- @comment.Author
-                       @:<br /><br />
-                   }
-                   else
-                   {
-                       @:- Guest User
-                       @:<br /><br />
-                   }
+                <li>
+                    @comment.Text
+                    @*@Html.ActionLink("Delete", "DeleteComment", "Event", new { id= EventManagementSystem.Data.Comment }, new { @class="btn btn-default"})*@
+                    @Html.HiddenFor(model => model.CommentId)
+                </li>
+                if (comment.Author != null)
+                {
+                    @:- @comment.Author
+                    @:<br /><br />
+                }
+                else
+                {
+                    @:- Guest User
+                    @:<br /><br />
+                }
 
-               }
-           </ul>
+            }
+        </ul>
     }
     else
     {
@@ -51,7 +52,9 @@
         @Html.ActionLink("Edit", "Edit", "Events", new { id = Model.Id }, new { @class = "btn btn-default" })
         <span></span>
         @Html.ActionLink("Delete", "Delete", "Events", new { id = Model.Id }, new { @class = "btn btn-default" })
-        <span></span>
+    <span></span>
+        @Html.ActionLink("Manage Comments", "ManageComments", "Events", new { id = Model.Id }, new { @class = "btn btn-default" })
+       
     }
 </div>
 

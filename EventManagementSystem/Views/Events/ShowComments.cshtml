@@ -1,0 +1,54 @@
+﻿@model IEnumerable<EventManagementSystem.Data.Comment>
+
+@{
+    ViewBag.Title = "Show Comments - Event Management System";
+}
+
+<h2>All Comments</h2>
+
+<table class="table table-bordered">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Id)
+        </th>
+        <th>
+            <strong>Comment By</strong>
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Text)
+        </th>
+        @*<th>
+            @Html.DisplayNameFor(model => model.Author)
+        </th>*@
+        @*<th>
+            @Html.DisplayNameFor(model => model.EventId)
+        </th>*@
+        <th>Action</th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Id)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Author.FullName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Text)
+        </td>
+        @*<td>
+            @Html.DisplayFor(modelItem => item.Author)
+        </td>*@
+        @*<td>
+            @Html.DisplayFor(modelItem => item.EventId)
+        </td>*@
+        <td>
+            @*@Html.ActionLink("Edit", "Edit", new {  id=item.Id  }) |*@
+            @*@if(User.Identity)*@
+            @Html.ActionLink("Delete", "DeleteComment", new { id=item.Id })
+        </td>
+    </tr>
+}
+
+</table>

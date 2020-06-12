@@ -18,7 +18,7 @@ namespace EventManagementSystem.ViewModels
 
         public int CommentId { get; set; }
 
-        public static Expression<Func<Event,EventDetailsViewModel>> ViewModel
+        public static Expression<Func<Event, EventDetailsViewModel>> ViewModel
         {
             get
             {
@@ -30,6 +30,19 @@ namespace EventManagementSystem.ViewModels
                     AuthorId = e.Author.Id
                 };
             }
+        }
+
+        public static Func<Event,EventDetailsViewModel> GetIdentification
+        {
+
+            get
+            {
+                return a => new EventDetailsViewModel()
+                {
+                    Id = a.Id
+                };
+            }
+
         }
     }
 }

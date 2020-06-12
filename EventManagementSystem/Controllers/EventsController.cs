@@ -41,7 +41,7 @@ namespace EventManagementSystem.Controllers
 
                 db.Events.Add(e);
                 db.SaveChanges();
-                this.AddNotification("Event Created Successfully!",NotificationType.SUCCESS);
+                this.AddNotification("Event Created Successfully!", NotificationType.SUCCESS);
                 return RedirectToAction("MyEvents");
             }
             return View(model);
@@ -80,7 +80,7 @@ namespace EventManagementSystem.Controllers
             return View(eventDetails);
         }
 
-
+        // edit an event
         [HttpPost]
         public ActionResult Edit(int id, EventInputModel model)
         {
@@ -103,6 +103,7 @@ namespace EventManagementSystem.Controllers
             return RedirectToAction("MyEvents");
         }
 
+        // delete an event
         public ActionResult Delete(int id)
         {
             var currentUserId = this.User.Identity.GetUserId();
@@ -116,55 +117,48 @@ namespace EventManagementSystem.Controllers
             return View(eventDetails);
         }
 
+        // call the ajax button method and redirect the specific action
+        public ActionResult ManageComments()
+        {
+            return RedirectToAction("ShowComments");
+        }
+
+        // show all comments
+        public ActionResult ShowComments()
+        {
+            var showComments = db.Comments.ToList();
+            return View(showComments);
+        }
+
+        // get the comment to delete
+        public ActionResult DeleteComment(int id)
+        {
+            var commentToDelete = db.Comments.Find(id);
+            return View(commentToDelete);
+        }
+
+        // delete Comment and redirect to Index Action
         [HttpPost]
-        public ActionResult Delete(int id, Event model)
+        public ActionResult DeleteComment(int id, Comment model)
         {
             var currentUserId = User.Identity.GetUserId();
             var isAdmin = this.IsAdmin();
-            var eventToDelete = db.Events.Where(e => e.Id == id).Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId)).FirstOrDefault();
-            if (model != null)
+            var eventToDelete = db.Comments.Where(e => e.Id == id).FirstOrDefault(e => e.AuthorId == currentUserId);
+            bool status = eventToDelete == null;
+            if (status)
             {
-                db.Events.Remove(eventToDelete);
+                this.AddNotification("You cannot delete somebody else's comment", NotificationType.ERROR);
+            }
+            else
+            {
+                db.Comments.Remove(eventToDelete);
                 db.SaveChanges();
+                this.AddNotification("Comment Deleted Successfully!", NotificationType.SUCCESS);
                 return RedirectToAction("MyEvents");
             }
-            return RedirectToAction("Error");
+            return RedirectToAction("DeleteComment");
         }
 
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult SubmitComment(CommentInputModel model)
-        {
-            try
-            {
-                if (model != null && ModelState.IsValid)
-                {
-
-
-                    var e = new Comment()
-                    {
-
-                        AuthorId = User.Identity.GetUserId(),
-                        Author = db.Users.First(),
-                        //Id = model.Id,
-                        Date = DateTime.Now,
-                        Text = model.Text,
-                    };
-
-                    db.Comments.Add(e);
-                    db.SaveChanges();
-                 
-                    return RedirectToAction("MyEvents");
-                }
-                return View(model);
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception(ex.Message);
-            }
-        }
 
     }
 }
