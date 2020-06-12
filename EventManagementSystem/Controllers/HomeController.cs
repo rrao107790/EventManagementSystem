@@ -30,7 +30,7 @@ namespace EventManagementSystem.Controllers
             var upcomingEvents = events.Where(e => e.StartDateTime > DateTime.Now);
             var passedEvents = events.Where(e => e.StartDateTime <= DateTime.Now);
 
-
+            ViewBag.AuthorName = events.Select(e => e.Author);
             return View(new UpcomingPassedEventsViewModel()
             {
                 UpcomingEvents = upcomingEvents,
@@ -96,11 +96,11 @@ namespace EventManagementSystem.Controllers
                     Comment e = null;
                     e = new Comment();
 
-                    //e.AuthorId = User.Identity.GetUserId();
+                    e.AuthorId = User.Identity.GetUserId();
+                    e.Author = ViewBag.AuthorName;
                     e.Date = DateTime.UtcNow;
                     e.Text = model.Text;
                     e.EventId = model.EventId;
-                    
 
                     db.Comments.Add(e);
                     db.SaveChanges();
@@ -113,6 +113,20 @@ namespace EventManagementSystem.Controllers
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public ActionResult DeleteComment(int id)
+        {
+            CommentViewModel obj = new CommentViewModel();
+            obj.EventId = id;
+            return PartialView("_AddComment", obj);
+        }
+
+        [HttpPost]
+        public ActionResult DeleteCommentById(int id)
+        {
+            
+            return RedirectToAction("Index");
         }
 
     }

@@ -1,35 +1,46 @@
 ﻿
 @model EventManagementSystem.ViewModels.EventDetailsViewModel
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrap.min.js"></script>
 
 @if (Model.Description != null)
 {
     <p>Description: @Model.Description</p>
 }
-@if (Model.Comments.Any())
-{
-    @:Comments:
-    <ul>
-        @foreach (var comment in Model.Comments)
-        {
-            <li>@comment.Text</li>
-            if (comment.Author != null)
-            {
-                @:(by @comment.Author)
-            }
-        }
-    </ul>
-}
-else
-{
-    <p>No Comments here</p>
-}
+<div class="card bg-info comment-section">
+    @if (Model.Comments.Any())
+    {
+        @: <h3>Comments:</h3>
+           <ul class="comments">
 
+               @foreach (var comment in Model.Comments)
+               {
+                   <li>@comment.Text</li>
+                   if (comment.Author != null)
+                   {
+                       @:- @comment.Author
+                       @:<br /><br />
+                   }
+                   else
+                   {
+                       @:- Guest User
+                       @:<br /><br />
+                   }
+
+               }
+           </ul>
+    }
+    else
+    {
+        <p>No Comments here</p>
+    }
+
+</div>
 <div class="form-group">
     <div id="event-details">
-        @Ajax.ActionLink("Add Comment", "GetCommentSection", "Home", 
+        @Ajax.ActionLink("Add Comment", "GetCommentSection", "Home",
        new { id = Model.Id }, new AjaxOptions() { UpdateTargetId = "event-details" })
     </div>
-    @Html.HiddenFor(model=>Model.Id)
 </div>
 <div class="form-group">
     @if (ViewBag.CanEdit)
