@@ -17,12 +17,11 @@
 
                 <li>
                     @comment.Text
-                    @*@Ajax.ActionLink("Delete", "DeleteComment", "Events", new { id = comment.CommentId }, new AjaxOptions() { UpdateTargetId = "comments" })*@
+
                     @Ajax.ActionLink("Delete", "DeleteComment", "Events",
-                new
-              {
-             id = comment.CommentId
-              }, new AjaxOptions { InsertionMode = InsertionMode.Replace, UpdateTargetId = "comments" }, new { @class = "btn btn-default delete-btn" })
+                                    new { id = comment.CommentId }, 
+                                    new AjaxOptions { InsertionMode = InsertionMode.Replace, UpdateTargetId = "comments" }, 
+                                    new { @class = "btn btn-default delete-btn" })
                 </li>
                 if (comment.Author != null)
                 {
@@ -46,8 +45,7 @@
 </div>
 <div class="form-group">
     <div id="event-details">
-        @Ajax.ActionLink("Add Comment", "GetCommentSection", "Home",
-       new { id = Model.Id }, new AjaxOptions() { UpdateTargetId = "event-details" })
+        @Ajax.ActionLink("Add Comment", "GetCommentSection", "Home", new { id = Model.Id }, new AjaxOptions() { UpdateTargetId = "event-details" })
     </div>
 </div>
 <div class="form-group">
@@ -63,7 +61,7 @@
 
 <script type="text/javascript">
     $(function () {
-
+        // hard reload the page
         $('.delete-btn').on('click', function () {
             location.reload(true);
         })
