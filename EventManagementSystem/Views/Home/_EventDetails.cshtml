@@ -1,6 +1,6 @@
 ﻿
 @model EventManagementSystem.ViewModels.EventDetailsViewModel
-
+<script src="@Url.Content("~/Scripts/jquery-3.4.1.min.js")" type="text/javascript"></script>
 
 @if (Model.Description != null)
 {
@@ -22,7 +22,7 @@
                 new
               {
              id = comment.CommentId
-              }, new AjaxOptions { InsertionMode = InsertionMode.Replace, UpdateTargetId = "comments" }, new { @class = "btn btn-default" })
+              }, new AjaxOptions { InsertionMode = InsertionMode.Replace, UpdateTargetId = "comments" }, new { @class = "btn btn-default delete-btn" })
                 </li>
                 if (comment.Author != null)
                 {
@@ -56,8 +56,18 @@
         @Html.ActionLink("Edit", "Edit", "Events", new { id = Model.Id }, new { @class = "btn btn-default" })
         <span></span>
         @Html.ActionLink("Delete", "Delete", "Events", new { id = Model.Id }, new { @class = "btn btn-default" })
-    
+
 
     }
 </div>
 
+<script type="text/javascript">
+    $(function () {
+
+        $('.delete-btn').on('click', function () {
+            location.reload(true);
+        })
+
+    });
+
+</script>
