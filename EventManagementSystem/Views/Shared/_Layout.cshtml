@@ -9,7 +9,7 @@
     @Scripts.Render("~/bundles/jquery")
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-default navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -25,6 +25,7 @@
                     {
                         <li>@Html.ActionLink("My Events", "MyEvents", "Events")</li>
                         <li>@Html.ActionLink("Create Event", "Create", "Events")</li>
+                        <li>@Html.ActionLink("Show Comments", "ShowComments", "Events")</li>
                     }
                 </ul>
                 @Html.Partial("_LoginPartial")
@@ -32,10 +33,11 @@
         </div>
     </div>
     <div class="container body-content">
+        @Html.Partial("_Notifications")
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            <p>&copy; @DateTime.Now.Year - Event Management System</p>
         </footer>
     </div>
 

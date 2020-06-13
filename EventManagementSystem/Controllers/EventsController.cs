@@ -1,12 +1,15 @@
 ﻿using EventManagementSystem.Data;
+using EventManagementSystem.Extensions;
 using EventManagementSystem.Models;
 using EventManagementSystem.ViewModels;
+using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Services.Description;
 
 namespace EventManagementSystem.Controllers
 {
@@ -23,7 +26,7 @@ namespace EventManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(EventInputModel model)
         {
-            if(model !=null && ModelState.IsValid)
+            if (model != null && ModelState.IsValid)
             {
                 var e = new Event()
                 {
@@ -38,7 +41,7 @@ namespace EventManagementSystem.Controllers
 
                 db.Events.Add(e);
                 db.SaveChanges();
-
+                this.AddNotification("Event Created Successfully!", NotificationType.SUCCESS);
                 return RedirectToAction("MyEvents");
             }
             return View(model);
@@ -61,26 +64,23 @@ namespace EventManagementSystem.Controllers
             });
         }
 
+
         // edits the forms
         public ActionResult Edit(int id)
         {
-            //var eventToEdit = LoadEvent(id);
-            //if(eventToEdit == null)
-            //{
-            //    return RedirectToAction("MyEvents");
-            //}
+
             var currentUserId = this.User.Identity.GetUserId();
             var isAdmin = this.IsAdmin();
             var eventDetails = this.db.Events
                                 .Where(e => e.Id == id)
-                                .Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
+                                .Where(e => e.IsPublic && e.AuthorId == currentUserId || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
                                 .Select(EventInputModel.CreateFromEvent).FirstOrDefault();
             var isOwner = (eventDetails != null);
             this.ViewBag.CanEdit = isOwner || isAdmin;
             return View(eventDetails);
         }
 
-     
+        // edit an event
         [HttpPost]
         public ActionResult Edit(int id, EventInputModel model)
         {
@@ -103,13 +103,82 @@ namespace EventManagementSystem.Controllers
             return RedirectToAction("MyEvents");
         }
 
-        //// Loads the event
-        //private Event LoadEvent(int id)
-        //{
-        //    var currentUserId = User.Identity.GetUserId();
-        //    var isAdmin = IsAdmin();
-        //    var eventToEdit = db.Events.Where(x => x.Id == id).FirstOrDefault(e => e.AuthorId == currentUserId || isAdmin);
-        //    return eventToEdit;
-        //}
+        // delete an event
+        public ActionResult Delete(int id)
+        {
+            var currentUserId = this.User.Identity.GetUserId();
+            var isAdmin = this.IsAdmin();
+            var eventDetails = this.db.Events
+                                .Where(e => e.Id == id)
+                                .Where(e => e.IsPublic && e.AuthorId == currentUserId || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
+                                .Select(EventInputModel.CreateFromEvent).FirstOrDefault();
+
+            if (eventDetails == null)
+            {
+                this.AddNotification("You cannot delete an event created by someone", NotificationType.ERROR);
+            }
+
+            var isOwner = (eventDetails != null);
+            this.ViewBag.CanEdit = isOwner || isAdmin;
+            return View(eventDetails);
+        }
+
+        [HttpPost]
+        public ActionResult Delete(int id, EventInputModel events)
+        {
+            var currentUserId = this.User.Identity.GetUserId();
+            var eventToDelete = db.Events.Where(x => x.Id == id && x.AuthorId == currentUserId).FirstOrDefault();
+            if (eventToDelete != null)
+            {
+                db.Events.Remove(eventToDelete);
+                db.SaveChanges();
+                this.AddNotification("Delete Success!", NotificationType.SUCCESS);
+                return RedirectToAction("MyEvents");
+               
+            }
+            this.AddNotification("You cannot delete an event created by someone", NotificationType.ERROR);
+            return RedirectToAction("Index","Home");
+
+
+        }
+
+        // call the ajax button method and redirect the specific action
+        public ActionResult ManageComments()
+        {
+            return RedirectToAction("ShowComments");
+        }
+
+        // show all comments
+        public ActionResult ShowComments()
+        {
+            var showComments = db.Comments.ToList();
+            return View(showComments);
+        }
+        [HttpPost]
+        public ActionResult ShowComments(int id)
+        {
+            var showComments = db.Comments.ToList();
+
+            return View(showComments);
+        }
+
+        // get the comment to delete
+        public ActionResult DeleteComment(int id)
+        {
+            var currentUserId = this.User.Identity.GetUserId();
+            var commentToDelete = db.Comments.Where(x => x.Id == id && x.AuthorId == currentUserId).FirstOrDefault();
+
+            bool status = commentToDelete == null;
+            // if author id doesn't match they can't delete the comment
+            if (status)
+            {
+                this.AddNotification("You cannot delete someone else's comment because you are authorized", NotificationType.ERROR);
+            }
+
+            db.Comments.Remove(commentToDelete);
+            db.SaveChanges();
+            this.AddNotification("Comment Deletion Success!", NotificationType.SUCCESS);
+            return RedirectToAction("Index");
+        }
     }
 }

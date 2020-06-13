@@ -1,32 +1,73 @@
 ﻿
 @model EventManagementSystem.ViewModels.EventDetailsViewModel
+<script src="@Url.Content("~/Scripts/jquery-3.4.1.min.js")" type="text/javascript"></script>
 
 @if (Model.Description != null)
 {
     <p>Description: @Model.Description</p>
 }
-@if (Model.Comments.Any())
-{
-    @:Comments:
-    <ul>
-        @foreach (var comment in Model.Comments)
-        {
-            <li>@comment.Text</li>
-            if (comment.Author != null)
-            {
-                @:(by @comment.Author)
-            }
-        }
-    </ul>
-}
-else
-{
-    <p>No Comments here</p>
-}
-@if (ViewBag.CanEdit)
-{
-    @Html.ActionLink("Edit", "Edit", "Events", new { id = Model.Id }, new {@class="btn btn-default" })
-    <span></span>
-    @Html.ActionLink("Delete", "Delete", "Events", new { id = Model.Id }, new {@class="btn btn-default" })
-}
+<div class="card bg-info comment-section">
+    @if (Model.Comments.Any())
+    {
+        @: <h3>Comments:</h3>
+        <ul class="comments">
 
+            @foreach (var comment in Model.Comments)
+            {
+
+                <li>
+                    @comment.Text
+                    @*@Ajax.ActionLink("Delete", "DeleteComment", "Events", new { id = comment.CommentId }, new AjaxOptions() { UpdateTargetId = "comments" })*@
+                    @Ajax.ActionLink("Delete", "DeleteComment", "Events",
+                new
+              {
+             id = comment.CommentId
+              }, new AjaxOptions { InsertionMode = InsertionMode.Replace, UpdateTargetId = "comments" }, new { @class = "btn btn-default delete-btn" })
+                </li>
+                if (comment.Author != null)
+                {
+                    @:- @comment.Author
+                    @:<br /><br />
+                }
+                else
+                {
+                    @:- Guest User
+                    @:<br /><br />
+                }
+
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No Comments here</p>
+    }
+
+</div>
+<div class="form-group">
+    <div id="event-details">
+        @Ajax.ActionLink("Add Comment", "GetCommentSection", "Home",
+       new { id = Model.Id }, new AjaxOptions() { UpdateTargetId = "event-details" })
+    </div>
+</div>
+<div class="form-group">
+    @if (ViewBag.CanEdit)
+    {
+        @Html.ActionLink("Edit", "Edit", "Events", new { id = Model.Id }, new { @class = "btn btn-default" })
+        <span></span>
+        @Html.ActionLink("Delete", "Delete", "Events", new { id = Model.Id }, new { @class = "btn btn-default" })
+
+
+    }
+</div>
+
+<script type="text/javascript">
+    $(function () {
+
+        $('.delete-btn').on('click', function () {
+            location.reload(true);
+        })
+
+    });
+
+</script>

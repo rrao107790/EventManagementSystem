@@ -11,7 +11,7 @@ namespace EventManagementSystem.Data
     {
         public Comment()
         {
-
+            this.Date = DateTime.Now;
         }
 
         public int Id { get; set; }
@@ -28,7 +28,7 @@ namespace EventManagementSystem.Data
 
         public int EventId { get; set; }
 
-        [Required]
+        
         public virtual Event Event { get; set; }
     }
 }

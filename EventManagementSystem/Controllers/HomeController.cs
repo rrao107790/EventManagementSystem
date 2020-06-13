@@ -1,4 +1,6 @@
-﻿using EventManagementSystem.Models;
+﻿using EventManagementSystem.Data;
+using EventManagementSystem.Extensions;
+using EventManagementSystem.Models;
 using EventManagementSystem.ViewModels;
 using Microsoft.AspNet.Identity;
 using System;
@@ -29,25 +31,114 @@ namespace EventManagementSystem.Controllers
             var upcomingEvents = events.Where(e => e.StartDateTime > DateTime.Now);
             var passedEvents = events.Where(e => e.StartDateTime <= DateTime.Now);
 
-
-            return View(new UpcomingPassedEventsViewModel() { 
+            ViewBag.AuthorName = events.Select(e => e.Author);
+            return View(new UpcomingPassedEventsViewModel()
+            {
                 UpcomingEvents = upcomingEvents,
                 PassedEvents = passedEvents
             });
         }
 
+        // get event details
         public ActionResult EventDetailsById(int id)
         {
-            var currentUserId = this.User.Identity.GetUserId();
-            var isAdmin = this.IsAdmin();
-            var eventDetails = this.db.Events
+            var currentUserId = User.Identity.GetUserId();
+            var isAdmin = IsAdmin();
+            var eventDetails = db.Events
                                 .Where(e => e.Id == id)
                                 .Where(e => e.IsPublic || isAdmin || (e.AuthorId != null && e.AuthorId == currentUserId))
                                 .Select(EventDetailsViewModel.ViewModel).FirstOrDefault();
             var isOwner = (eventDetails != null || eventDetails.AuthorId != null && eventDetails.AuthorId == currentUserId);
             this.ViewBag.CanEdit = isOwner || isAdmin;
 
-            return this.PartialView("_EventDetails",eventDetails);
+            EventDetailsViewModel obj = new EventDetailsViewModel();
+            obj.Comments = eventDetails.Comments;
+            obj.Id = eventDetails.CommentId;
+
+            return PartialView("_EventDetails", eventDetails);
         }
+
+        // get the comments posted by User
+        public ActionResult OpenComments(int id)
+        {
+            var currentUserId = User.Identity.GetUserId();
+            var isAdmin = IsAdmin();
+            var eventDetails = db.Comments
+                                .Where(e => e.Id == id)
+                                .Where(e => e.AuthorId != null && e.AuthorId == currentUserId)
+                                .Select(CommentViewModel.ViewModel).FirstOrDefault();
+            var isOwner = (eventDetails != null || (eventDetails.AuthorId != null && eventDetails.AuthorId == currentUserId));
+            this.ViewBag.CanEdit = isOwner || isAdmin;
+
+            return PartialView("_AddComment", eventDetails);
+        }
+
+        // Get the Partial View for  Displaying Comment Box
+        public ActionResult GetCommentSection(int id)
+        {
+            CommentViewModel obj = new CommentViewModel();
+            obj.EventId = id;
+            return PartialView("_AddComment", obj);
+        }
+
+        public ActionResult SubmitComment(int id)
+        {
+            var eventDetails = db.Events.Where(x => x.Id == id)
+                        .Select(EventDetailsViewModel.ViewModel).FirstOrDefault();
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult SubmitComment(CommentViewModel model)
+        {
+            try
+            {
+                if (model != null && ModelState.IsValid)
+                {
+
+                    Comment e = null;
+                    e = new Comment();
+
+                    e.AuthorId = User.Identity.GetUserId();
+                    e.Author = ViewBag.AuthorName;
+                    e.Date = DateTime.UtcNow;
+                    e.Text = model.Text;
+                    e.EventId = model.EventId;
+
+                    db.Comments.Add(e);
+                    db.SaveChanges();
+                    this.AddNotification("Comment Added Successfully!", NotificationType.SUCCESS);
+                    return RedirectToAction("Index");
+                }
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public ActionResult DeleteComment(int id)
+        {
+            var currentUserId = User.Identity.GetUserId();
+            var isAdmin = IsAdmin();
+            var eventDetails = db.Comments
+                                .Where(e => e.Id == id)
+                                .Where(e => e.AuthorId != null && e.AuthorId == currentUserId)
+                                .Select(CommentViewModel.ViewModel).FirstOrDefault();
+            
+
+            return PartialView("_AddComment", eventDetails);
+        }
+
+        [HttpPost]
+        public ActionResult DeleteCommentById(int id)
+        {
+
+            return RedirectToAction("Index");
+        }
+
     }
 }
